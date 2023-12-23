@@ -1,5 +1,5 @@
-use std::{fs, str::FromStr};
 use crate::CalibrationSet::Coordinates;
+use std::{fs, str::FromStr};
 
 #[derive(Debug, Copy, Clone)]
 enum Digit {
@@ -36,7 +36,7 @@ impl Digit {
             }
         }
 
-        let mut result = match string_slice {
+        match string_slice {
             "1" => Digit::NUMBER(1),
             "2" => Digit::NUMBER(2),
             "3" => Digit::NUMBER(3),
@@ -91,34 +91,33 @@ impl Digit {
                         return sub_result;
                     }
 
-                    if !left_edge.is_number() && !right_edge.is_number() {
-                        let resized_slice = &sub_slice[1..sub_slice.len()-1];
-                        sub_result = Digit::from_str(resized_slice);
-                        return sub_result;
-                    }
-
                     if left_edge.is_number() {
                         for i in 1..5 {
-                            let resized_slice = &sub_slice[..sub_slice.len()-i];
+                            let resized_slice = &sub_slice[..sub_slice.len() - i];
                             sub_result = Digit::from_str(resized_slice);
-                            return sub_result;
                         }
+                        return sub_result;
                     }
 
                     if right_edge.is_number() {
                         for i in 1..5 {
                             let resized_slice = &sub_slice[i..sub_slice.len()];
                             sub_result = Digit::from_str(resized_slice);
-                            return sub_result;
+                            println!("resized_slice is: {:?}", resized_slice);
                         }
+                        return sub_result;
+                    }
+
+                    if !left_edge.is_number() && !right_edge.is_number() {
+                        let resized_slice = &sub_slice[1..sub_slice.len() - 1];
+                        sub_result = Digit::from_str(resized_slice);
+                        return sub_result;
                     }
 
                     sub_result
                 }
             }
-        };
-
-        result
+        }
     }
 
     fn value(&self) -> i32 {
@@ -150,7 +149,7 @@ impl Digit {
             "seven" => 5,
             "eight" => 5,
             "nine" => 4,
-            _ => 0
+            _ => 0,
         }
     }
 
@@ -237,7 +236,6 @@ impl Coordinate {
     }
 
     fn to_int(&self) -> i32 {
-
         match *self {
             Coordinate::EMPTY => 0,
             Coordinate::HALF(first_coord) => first_coord * 10 + first_coord,
@@ -249,7 +247,7 @@ impl Coordinate {
 #[derive(Debug, Clone)]
 enum CalibrationSet {
     EMPTY,
-    Coordinates(Vec<Coordinate>)
+    Coordinates(Vec<Coordinate>),
 }
 
 impl CalibrationSet {
@@ -264,7 +262,7 @@ impl CalibrationSet {
                 let mut new_list = coordinates_list.to_vec();
                 new_list.push(coordinate);
                 CalibrationSet::Coordinates(new_list)
-            },
+            }
         }
     }
 
@@ -278,11 +276,10 @@ impl CalibrationSet {
                     result += coord.to_int()
                 }
                 return Ok(result);
-            },
+            }
         }
     }
 }
-
 
 fn main() -> Result<(), std::io::Error> {
     println!("Hello, Advent of Code 2023!\n");
