@@ -292,7 +292,6 @@ fn main() -> Result<(), std::io::Error> {
     //let content = fs::read_to_string("src/bin/test_input.txt")?;
     let lines: Vec<&str> = content.lines().collect();
     println!("total lines found: {}", lines.len());
-    println!("first line found: {}", lines[1]);
 
     let mut calibration = CalibrationSet::new();
 
@@ -311,4 +310,25 @@ fn main() -> Result<(), std::io::Error> {
     println!("SOLUTION IS: {:?}", solution.unwrap());
 
     Ok(())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_solution() {
+        let content = fs::read_to_string("src/bin/test_input.txt").unwrap();
+        let lines: Vec<&str> = content.lines().collect();
+
+        let mut calibration = CalibrationSet::new();
+
+        for line in lines {
+            let parsed_line = Coordinate::from_str(line);
+            calibration = calibration.add(parsed_line);
+        }
+
+        let solution = calibration.compute();
+        assert_eq!(solution.unwrap(), 281);
+    }
 }
