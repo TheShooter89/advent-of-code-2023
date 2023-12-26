@@ -1,3 +1,5 @@
+use std::error::Error;
+
 #[derive(Debug, PartialEq, Eq)]
 pub enum Cube {
     Red(i32),
@@ -14,22 +16,23 @@ impl Cube {
         }
     }
 
-    pub fn from_str(line: &str) -> Option<Cube> {
-        let mut cube_quantity = 0;
-        let mut cube_type = "";
+    pub fn parse_str(line: &str) -> Option<Cube> {
+        let elements: Vec<&str> = line.trim().split_whitespace().collect();
 
-        for i in 0..line.len() {
-            if &line[i..i + 1] == " " {
-                cube_quantity = line[..i].parse().unwrap();
-                cube_type = &line[i + 1..line.len()];
-                break;
-            }
+        if elements.len() < 1 || elements.len() > 2 {
+            return None;
         }
 
-        match cube_type {
-            "red" => Some(Cube::Red(cube_quantity)),
-            "green" => Some(Cube::Green(cube_quantity)),
-            "blue" => Some(Cube::Blue(cube_quantity)),
+        if elements[0].parse::<i32>().is_err() {
+            return None;
+        }
+
+        let cube_number = elements[0].parse::<i32>().unwrap();
+
+        match elements[1] {
+            "red" => Some(Cube::Red(cube_number)),
+            "green" => Some(Cube::Green(cube_number)),
+            "blue" => Some(Cube::Blue(cube_number)),
             _ => None,
         }
     }
@@ -42,15 +45,38 @@ mod tests {
     #[test]
     fn test_cube_from_str() {
         let control_cube = Cube::Green(4);
-        let cube_from_str = Cube::from_str("4 green").unwrap();
+        let cube_from_str = Cube::parse_str("4 green").unwrap();
         assert_eq!(cube_from_str, control_cube);
+
+        let control_cube = Cube::Blue(876);
+        let cube_from_str = Cube::parse_str("876 blue").unwrap();
+        assert_eq!(cube_from_str, control_cube);
+
+        let control_cube = Cube::Red(56);
+        let cube_from_str = Cube::parse_str("56 red").unwrap();
+        assert_eq!(cube_from_str, control_cube);
+    }
+
+    #[test]
+    fn test_cube_from_enum() {
+        let control_cube = Cube::Green(4);
+        assert_eq!(control_cube, Cube::Green(4));
+        assert_eq!(control_cube.count(), 4);
+
+        let control_cube = Cube::Blue(876);
+        assert_eq!(control_cube, Cube::Blue(876));
+        assert_eq!(control_cube.count(), 876);
+
+        let control_cube = Cube::Red(56);
+        assert_eq!(control_cube, Cube::Red(56));
+        assert_eq!(control_cube.count(), 56);
     }
 
     #[test]
     #[should_panic]
     fn test_bad_cube_str() {
-        let cube_from_str = Cube::from_str("4 ygreen").unwrap();
-        let cube_from_str = Cube::from_str("yigi4 green").unwrap();
-        let cube_from_str = Cube::from_str("4green").unwrap();
+        let cube_from_str = Cube::parse_str("4 ygreen").unwrap();
+        let cube_from_str = Cube::parse_str("yigi4 green").unwrap();
+        let cube_from_str = Cube::parse_str("4green").unwrap();
     }
 }
