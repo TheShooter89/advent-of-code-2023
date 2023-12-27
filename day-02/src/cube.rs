@@ -1,6 +1,6 @@
 use std::error::Error;
 
-#[derive(Debug, PartialEq, Eq)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Cube {
     Red(i32),
     Green(i32),
@@ -8,6 +8,30 @@ pub enum Cube {
 }
 
 impl Cube {
+    //pub fn set(&mut self, count: i32) {
+    //    match self {
+    //        Cube::Red(val) => *val + count,
+    //        Cube::Green(val) => *val + count,
+    //        Cube::Blue(val) => *val + count,
+    //    };
+    //}
+
+    pub fn set(&mut self, count: i32) -> Self {
+        //
+        match *self {
+            Cube::Red(val) => *self = Cube::Red(val + count),
+            Cube::Green(val) => *self = Cube::Green(val + count),
+            Cube::Blue(val) => *self = Cube::Blue(val + count),
+            //Cube::Red(val) => Self::Red(*val + count),
+            //Cube::Green(val) => Self::Green(*val + count),
+            //Cube::Blue(val) => Self::Blue(*val + count),
+            //Cube::Red(val) => *val + count,
+            //Cube::Green(val) => *val + count,
+            //Cube::Blue(val) => *val + count,
+        };
+        *self
+    }
+
     pub fn count(&self) -> i32 {
         match *self {
             Cube::Red(val) => val,
@@ -19,7 +43,7 @@ impl Cube {
     pub fn parse_str(line: &str) -> Option<Cube> {
         let elements: Vec<&str> = line.trim().split_whitespace().collect();
 
-        if elements.len() < 1 || elements.len() > 2 {
+        if elements.len() != 2 {
             return None;
         }
 
@@ -68,6 +92,24 @@ mod tests {
         assert_eq!(control_cube.count(), 876);
 
         let control_cube = Cube::Red(56);
+        assert_eq!(control_cube, Cube::Red(56));
+        assert_eq!(control_cube.count(), 56);
+    }
+
+    #[test]
+    fn test_cube_set() {
+        let mut control_cube = Cube::Green(0);
+        control_cube.set(4);
+        assert_eq!(control_cube, Cube::Green(4));
+        assert_eq!(control_cube.count(), 4);
+
+        let mut control_cube = Cube::Blue(0);
+        control_cube.set(876);
+        assert_eq!(control_cube, Cube::Blue(876));
+        assert_eq!(control_cube.count(), 876);
+
+        let mut control_cube = Cube::Red(0);
+        control_cube.set(56);
         assert_eq!(control_cube, Cube::Red(56));
         assert_eq!(control_cube.count(), 56);
     }
