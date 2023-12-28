@@ -3,14 +3,14 @@ use std::error::Error;
 use super::*;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-struct Subset {
+pub struct Subset {
     red: Cube,
     green: Cube,
     blue: Cube,
 }
 
 impl Subset {
-    fn new() -> Subset {
+    pub fn new() -> Subset {
         Subset {
             red: Cube::Red(0),
             green: Cube::Green(0),
@@ -18,7 +18,7 @@ impl Subset {
         }
     }
 
-    fn add(&mut self, element: Cube) {
+    pub fn add(&mut self, element: Cube) {
         match element {
             Cube::Red(count) => self.red = Cube::Red(count),
             Cube::Green(count) => self.green = Cube::Green(count),
@@ -26,7 +26,7 @@ impl Subset {
         };
     }
 
-    fn parse_str(line: &str) -> Option<Subset> {
+    pub fn parse_str(line: &str) -> Option<Subset> {
         //
         let elements: Vec<&str> = line.trim().split(",").collect();
 
