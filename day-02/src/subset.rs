@@ -26,6 +26,22 @@ impl Subset {
         };
     }
 
+    pub fn contains(&self, subset: Subset) -> bool {
+        let fields = [
+            (self.red.count(), subset.red.count()),
+            (self.green.count(), subset.green.count()),
+            (self.blue.count(), subset.blue.count()),
+        ];
+
+        for (self_cube, cube_to_compare) in fields {
+            if cube_to_compare > self_cube {
+                return false;
+            }
+        }
+
+        true
+    }
+
     pub fn parse_str(line: &str) -> Option<Subset> {
         //
         let elements: Vec<&str> = line.trim().split(",").collect();
@@ -103,5 +119,25 @@ mod tests {
             assert_eq!(subset.blue, Cube::Blue(7));
             assert_eq!(control_subset.blue, Cube::Blue(7));
         }
+    }
+
+    #[test]
+    fn test_subset_contains() {
+        let mut control_subset = Subset::new();
+        control_subset.add(Cube::Red(23));
+        control_subset.add(Cube::Green(33));
+        control_subset.add(Cube::Blue(7));
+
+        let test_subset_identical = Subset::parse_str("23 red,33 green,7 blue").unwrap();
+        let test_subset_valid = Subset::parse_str("6 red,12 green,1 blue").unwrap();
+        let test_subset_valid_partial_fields = Subset::parse_str("21 red,3 blue").unwrap();
+        let test_subset_invalid = Subset::parse_str("6 red,865 green,1 blue").unwrap();
+        let test_subset_invalid_spaced = Subset::parse_str("6 red, 865 green, 1 blue").unwrap();
+
+        assert!(control_subset.contains(test_subset_identical));
+        assert!(control_subset.contains(test_subset_valid));
+        assert!(control_subset.contains(test_subset_valid_partial_fields));
+        assert!(!control_subset.contains(test_subset_invalid));
+        assert!(!control_subset.contains(test_subset_invalid_spaced));
     }
 }
