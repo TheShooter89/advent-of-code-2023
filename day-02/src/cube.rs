@@ -8,26 +8,12 @@ pub enum Cube {
 }
 
 impl Cube {
-    //pub fn set(&mut self, count: i32) {
-    //    match self {
-    //        Cube::Red(val) => *val + count,
-    //        Cube::Green(val) => *val + count,
-    //        Cube::Blue(val) => *val + count,
-    //    };
-    //}
-
     pub fn set(&mut self, count: i32) -> Self {
         //
         match *self {
             Cube::Red(val) => *self = Cube::Red(val + count),
             Cube::Green(val) => *self = Cube::Green(val + count),
             Cube::Blue(val) => *self = Cube::Blue(val + count),
-            //Cube::Red(val) => Self::Red(*val + count),
-            //Cube::Green(val) => Self::Green(*val + count),
-            //Cube::Blue(val) => Self::Blue(*val + count),
-            //Cube::Red(val) => *val + count,
-            //Cube::Green(val) => *val + count,
-            //Cube::Blue(val) => *val + count,
         };
         *self
     }
@@ -37,6 +23,15 @@ impl Cube {
             Cube::Red(val) => val,
             Cube::Green(val) => val,
             Cube::Blue(val) => val,
+        }
+    }
+
+    pub fn contains(&self, cube: Cube) -> bool {
+        match (*self, cube) {
+            (Cube::Red(val), Cube::Red(val2)) => val2 <= val,
+            (Cube::Green(val), Cube::Green(val2)) => val2 <= val,
+            (Cube::Blue(val), Cube::Blue(val2)) => val2 <= val,
+            _ => false,
         }
     }
 
@@ -112,6 +107,15 @@ mod tests {
         control_cube.set(56);
         assert_eq!(control_cube, Cube::Red(56));
         assert_eq!(control_cube.count(), 56);
+    }
+
+    #[test]
+    fn test_cube_containing() {
+        let control_cube = Cube::Green(23);
+        assert!(control_cube.contains(Cube::Green(18)));
+        assert!(control_cube.contains(Cube::Green(23)));
+        assert!(control_cube.contains(Cube::Green(8)));
+        assert!(!control_cube.contains(Cube::Green(45)));
     }
 
     #[test]
