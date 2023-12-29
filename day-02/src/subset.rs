@@ -4,9 +4,9 @@ use super::*;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Subset {
-    red: Cube,
-    green: Cube,
-    blue: Cube,
+    pub red: Cube,
+    pub green: Cube,
+    pub blue: Cube,
 }
 
 impl Subset {
