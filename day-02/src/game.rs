@@ -1,13 +1,19 @@
 use super::*;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-struct Game {
-    id: i32,
-    subsets: Vec<Subset>,
+pub struct Game {
+    pub id: i32,
+    pub subsets: Vec<Subset>,
+}
+
+impl Default for Game {
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 impl Game {
-    pub fn from_str(line: &str) -> Game {
+    pub fn new() -> Game {
         Game {
             id: 0,
             subsets: vec![],
@@ -71,6 +77,15 @@ impl Game {
             subsets: new_subset_list,
         })
     }
+
+    pub fn is_valid_for_subset(&self, subset: &Subset) -> bool {
+        for current_subset in self.subsets.iter() {
+            if !subset.contains(current_subset) {
+                return false;
+            }
+        }
+        true
+    }
 }
 
 #[cfg(test)]
@@ -94,7 +109,7 @@ mod tests {
         test_subset3.add(Cube::Green(0));
         test_subset3.add(Cube::Blue(1080));
 
-        let mut control_game = Game {
+        let control_game = Game {
             id: 13,
             subsets: vec![test_subset1, test_subset2, test_subset3],
         };
@@ -105,6 +120,9 @@ mod tests {
             )
             .unwrap()
         );
+
+        let reference_subset = Subset::parse_str("96 red, 69 green, 1080 blue").unwrap();
+        assert!(control_game.is_valid_for_subset(&reference_subset));
     }
 
     #[test]
