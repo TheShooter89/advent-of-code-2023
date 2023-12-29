@@ -26,7 +26,7 @@ impl Subset {
         };
     }
 
-    pub fn contains(&self, subset: Subset) -> bool {
+    pub fn contains(&self, subset: &Subset) -> bool {
         let fields = [
             (self.red.count(), subset.red.count()),
             (self.green.count(), subset.green.count()),
@@ -134,10 +134,10 @@ mod tests {
         let test_subset_invalid = Subset::parse_str("6 red,865 green,1 blue").unwrap();
         let test_subset_invalid_spaced = Subset::parse_str("6 red, 865 green, 1 blue").unwrap();
 
-        assert!(control_subset.contains(test_subset_identical));
-        assert!(control_subset.contains(test_subset_valid));
-        assert!(control_subset.contains(test_subset_valid_partial_fields));
-        assert!(!control_subset.contains(test_subset_invalid));
-        assert!(!control_subset.contains(test_subset_invalid_spaced));
+        assert!(control_subset.contains(&test_subset_identical));
+        assert!(control_subset.contains(&test_subset_valid));
+        assert!(control_subset.contains(&test_subset_valid_partial_fields));
+        assert!(!control_subset.contains(&test_subset_invalid));
+        assert!(!control_subset.contains(&test_subset_invalid_spaced));
     }
 }
