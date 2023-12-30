@@ -1,6 +1,6 @@
 use std::{fs, i32};
 
-use day02::{Cube, Game, GameList, Subset};
+use day02::{Cube, Game, Subset, ValidatedGameList};
 
 fn print_title() {
     println!("Advent of Code 2023 - Day 02 [PART 1]\n");
@@ -18,7 +18,7 @@ fn print_bag_composition(bag: &Subset) {
     println!("+-----------------------------+\n");
 }
 
-fn print_result(list: GameList) {
+fn print_result(list: ValidatedGameList) {
     let valid_games: Vec<i32> = list.valid_games.iter().map(|game| game.id).collect();
     let valid_games_percentage: f32 = list.valid_games.len() as f32 / list.games.len() as f32;
     let percent_label = (valid_games_percentage * 100.0) as u32;
@@ -41,7 +41,7 @@ fn print_result(list: GameList) {
     println!("+--------------------------------------\n");
 }
 
-fn check_games(games_lines: &Vec<&str>, cubes_bag: &Subset) -> GameList {
+fn check_games(games_lines: &Vec<&str>, cubes_bag: &Subset) -> ValidatedGameList {
     let mut games_list: Vec<Game> = vec![];
     let mut id_accumulator = 0;
     let mut valid_games: Vec<Game> = vec![];
@@ -64,7 +64,7 @@ fn check_games(games_lines: &Vec<&str>, cubes_bag: &Subset) -> GameList {
         }
     }
 
-    GameList {
+    ValidatedGameList {
         id_sum: id_accumulator,
         games: games_list,
         valid_games: valid_games,
