@@ -10,6 +10,12 @@ pub struct ValidatedGameList {
 }
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MinimumCombinationGameList {
+    pub combinations_pow_sum: i32,
+    pub combinations: Vec<Subset>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Game {
     pub id: i32,
     pub subsets: Vec<Subset>,
