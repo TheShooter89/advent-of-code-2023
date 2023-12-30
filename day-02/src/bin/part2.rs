@@ -31,26 +31,15 @@ fn print_bag_composition(bag: &Subset) {
     println!("+-----------------------------+\n");
 }
 
-fn print_result(list: ValidatedGameList) {
-    let valid_games: Vec<i32> = list.valid_games.iter().map(|game| game.id).collect();
-    let valid_games_percentage: f32 = list.valid_games.len() as f32 / list.games.len() as f32;
-    let percent_label = (valid_games_percentage * 100.0) as u32;
-    let all_games: Vec<i32> = list.games.iter().map(|game| game.id).collect();
+fn print_result(list: &MinimumCombinationGameList) {
+    let power_sum = list.combinations_pow_sum;
+    let all_combinations = &list.combinations;
 
     println!("+--------------------------------------");
     println!("| RESULTS:");
     println!("+--------------------------------------");
-    println!("| total sum of ids: {:?}", list.id_sum);
-    println!(
-        "| number of valid games: {:?} ({:?} %)",
-        list.valid_games.len(),
-        percent_label
-    );
-    println!("| valid games: {:?}", valid_games);
-
-    println!("| number of games: {:?}", list.games.len());
-
-    println!("| all games: {:?}", all_games);
+    println!("| sum of combinations power: {:?}", power_sum);
+    println!("| all minimum valid combinations: {:?}", all_combinations);
     println!("+--------------------------------------\n");
 }
 
@@ -82,14 +71,13 @@ fn check_games(games_lines: &Vec<&str>) -> MinimumCombinationGameList {
 fn main() -> Result<(), std::io::Error> {
     print_title();
 
-    let content = fs::read_to_string("src/bin/input1.txt")?;
     //let content = fs::read_to_string("src/bin/test_input.txt")?;
+    let content = fs::read_to_string("src/bin/input1.txt")?;
     let lines: Vec<&str> = content.lines().collect();
 
-    let mut cubes_bag = Subset::new();
-    cubes_bag.add(Cube::Red(12));
-    cubes_bag.add(Cube::Green(13));
-    cubes_bag.add(Cube::Blue(14));
+    let minimum_valid_combination_list = check_games(&lines);
+
+    print_result(&minimum_valid_combination_list);
 
     Ok(())
 }
