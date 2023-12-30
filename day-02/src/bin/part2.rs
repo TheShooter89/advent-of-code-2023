@@ -1,6 +1,6 @@
 use std::{fs, i32};
 
-use day02::{Cube, Game, Subset, ValidatedGameList};
+use day02::{Cube, Game, MinimumCombinationGameList, Subset, ValidatedGameList};
 
 fn print_title() {
     println!("Advent of Code 2023 - Day 02 [PART 1]\n");
@@ -41,10 +41,10 @@ fn print_result(list: ValidatedGameList) {
     println!("+--------------------------------------\n");
 }
 
-fn check_games(games_lines: &Vec<&str>, cubes_bag: &Subset) -> ValidatedGameList {
+fn check_games(games_lines: &Vec<&str>) -> MinimumCombinationGameList {
     let mut games_list: Vec<Game> = vec![];
-    let mut id_accumulator = 0;
-    let mut valid_games: Vec<Game> = vec![];
+    let mut combinations_pow_accumulator = 0;
+    let mut combinations_list: Vec<Subset> = vec![];
 
     for game_str in games_lines {
         let parsed_game = Game::parse_str(game_str);
@@ -52,22 +52,17 @@ fn check_games(games_lines: &Vec<&str>, cubes_bag: &Subset) -> ValidatedGameList
         match parsed_game {
             Some(game) => {
                 //println!("game: {:?}", game);
-                if game.is_valid_for_subset(cubes_bag) {
-                    id_accumulator += game.id;
-                    valid_games.push(game.clone());
-                    games_list.push(game.clone());
-                    continue;
-                }
-                games_list.push(game.clone());
+                let game_minimum_combination = game.minimum_valid_combination();
+                combinations_list.push(game_minimum_combination);
+                combinations_pow_accumulator += game_minimum_combination.pow()
             }
             None => continue,
         }
     }
 
-    ValidatedGameList {
-        id_sum: id_accumulator,
-        games: games_list,
-        valid_games: valid_games,
+    MinimumCombinationGameList {
+        combinations_pow_sum: combinations_pow_accumulator,
+        combinations: combinations_list,
     }
 }
 
