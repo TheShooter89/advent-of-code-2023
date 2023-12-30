@@ -1,7 +1,7 @@
 use super::*;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct GameList {
+pub struct ValidatedGameList {
     pub id_sum: i32,
     pub games: Vec<Game>,
     pub valid_games: Vec<Game>,
