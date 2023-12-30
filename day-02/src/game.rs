@@ -1,3 +1,5 @@
+use std::result;
+
 use super::*;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
@@ -93,6 +95,33 @@ impl Game {
         }
         true
     }
+
+    pub fn minimum_valid_combination(&self) -> Subset {
+        let mut min_red = 0;
+        let mut min_green = 0;
+        let mut min_blue = 0;
+        let mut result = Subset::new();
+
+        for sub in &self.subsets {
+            if sub.red.count() > min_red {
+                min_red = sub.red.count();
+            }
+
+            if sub.green.count() > min_green {
+                min_green = sub.green.count();
+            }
+
+            if sub.blue.count() > min_blue {
+                min_blue = sub.blue.count();
+            }
+        }
+
+        result.add(Cube::Red(min_red));
+        result.add(Cube::Green(min_green));
+        result.add(Cube::Blue(min_blue));
+
+        result
+    }
 }
 
 #[cfg(test)]
@@ -162,5 +191,37 @@ mod tests {
             ),
             vec![test_subset1, test_subset2, test_subset3]
         )
+    }
+
+    #[test]
+    fn test_minimum_valid_combination() {
+        let mut control_subset = Subset::new();
+        control_subset.add(Cube::Red(4));
+        control_subset.add(Cube::Green(2));
+        control_subset.add(Cube::Blue(6));
+
+        let mut test_subset_1 = Subset::new();
+        test_subset_1.add(Cube::Red(4));
+        test_subset_1.add(Cube::Green(0));
+        test_subset_1.add(Cube::Blue(3));
+
+        let mut test_subset_2 = Subset::new();
+        test_subset_2.add(Cube::Red(1));
+        test_subset_2.add(Cube::Green(2));
+        test_subset_2.add(Cube::Blue(6));
+
+        let mut test_subset_3 = Subset::new();
+        test_subset_3.add(Cube::Red(0));
+        test_subset_3.add(Cube::Green(2));
+        test_subset_3.add(Cube::Blue(0));
+
+        let mut test_game = Game::new();
+        test_game.add(test_subset_1);
+        test_game.add(test_subset_2);
+        test_game.add(test_subset_3);
+
+        let test_minimum_valid_combination = test_game.minimum_valid_combination();
+
+        assert_eq!(test_minimum_valid_combination, control_subset)
     }
 }
