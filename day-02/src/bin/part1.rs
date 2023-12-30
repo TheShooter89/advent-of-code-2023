@@ -1,6 +1,19 @@
 use std::{fs, i32};
 
-use day02::{Cube, Game, Subset, ValidatedGameList};
+use day02::{Cube, Game, Subset};
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ValidatedGameList {
+    pub id_sum: i32,
+    pub games: Vec<Game>,
+    pub valid_games: Vec<Game>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MinimumCombinationGameList {
+    pub combinations_pow_sum: i32,
+    pub combinations: Vec<Subset>,
+}
 
 fn print_title() {
     println!("Advent of Code 2023 - Day 02 [PART 1]\n");
