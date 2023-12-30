@@ -1,6 +1,19 @@
 use std::{fs, i32};
 
-use day02::{Cube, Game, MinimumCombinationGameList, Subset, ValidatedGameList};
+use day02::{Cube, Game, Subset};
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ValidatedGameList {
+    pub id_sum: i32,
+    pub games: Vec<Game>,
+    pub valid_games: Vec<Game>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct MinimumCombinationGameList {
+    pub combinations_pow_sum: i32,
+    pub combinations: Vec<Subset>,
+}
 
 fn print_title() {
     println!("Advent of Code 2023 - Day 02 [PART 1]\n");
@@ -53,8 +66,8 @@ fn check_games(games_lines: &Vec<&str>) -> MinimumCombinationGameList {
             Some(game) => {
                 //println!("game: {:?}", game);
                 let game_minimum_combination = game.minimum_valid_combination();
+                combinations_pow_accumulator += game_minimum_combination.pow();
                 combinations_list.push(game_minimum_combination);
-                combinations_pow_accumulator += game_minimum_combination.pow()
             }
             None => continue,
         }
@@ -78,13 +91,6 @@ fn main() -> Result<(), std::io::Error> {
     cubes_bag.add(Cube::Green(13));
     cubes_bag.add(Cube::Blue(14));
 
-    print_bag_composition(&cubes_bag);
-    println!("### processing...");
-
-    let games_list = check_games(&lines, &cubes_bag);
-
-    print_result(games_list);
-
     Ok(())
 }
 
@@ -98,14 +104,14 @@ mod tests {
         let content = fs::read_to_string("src/bin/test_input.txt").unwrap();
         let lines: Vec<&str> = content.lines().collect();
 
-        let mut cubes_bag = Subset::new();
-        cubes_bag.add(Cube::Red(12));
-        cubes_bag.add(Cube::Green(13));
-        cubes_bag.add(Cube::Blue(14));
+        let minimum_valid_combination_list = check_games(&lines);
 
-        let games_list = check_games(&lines, &cubes_bag);
+        assert_eq!(minimum_valid_combination_list.combinations[0].pow(), 48);
+        assert_eq!(minimum_valid_combination_list.combinations[1].pow(), 12);
+        assert_eq!(minimum_valid_combination_list.combinations[2].pow(), 1560);
+        assert_eq!(minimum_valid_combination_list.combinations[3].pow(), 630);
+        assert_eq!(minimum_valid_combination_list.combinations[4].pow(), 36);
 
-        //assert_eq!(games_list.id_sum, 2563);
-        assert_eq!(games_list.id_sum, 8);
+        assert_eq!(minimum_valid_combination_list.combinations_pow_sum, 2286);
     }
 }
