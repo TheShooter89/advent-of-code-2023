@@ -1,6 +1,13 @@
 use super::*;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
+pub struct GameList {
+    pub id_sum: i32,
+    pub games: Vec<Game>,
+    pub valid_games: Vec<Game>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Game {
     pub id: i32,
     pub subsets: Vec<Subset>,
