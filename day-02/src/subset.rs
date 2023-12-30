@@ -26,6 +26,10 @@ impl Subset {
         };
     }
 
+    pub fn pow(&self) -> i32 {
+        self.red.count() * self.green.count() * self.blue.count()
+    }
+
     pub fn contains(&self, subset: &Subset) -> bool {
         let fields = [
             (self.red.count(), subset.red.count()),
@@ -139,5 +143,15 @@ mod tests {
         assert!(control_subset.contains(&test_subset_valid_partial_fields));
         assert!(!control_subset.contains(&test_subset_invalid));
         assert!(!control_subset.contains(&test_subset_invalid_spaced));
+    }
+
+    #[test]
+    fn test_subset_pow() {
+        let mut control_subset = Subset::new();
+        control_subset.add(Cube::Red(4));
+        control_subset.add(Cube::Green(2));
+        control_subset.add(Cube::Blue(6));
+
+        assert_eq!(control_subset.pow(), 48);
     }
 }
