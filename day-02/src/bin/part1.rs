@@ -64,8 +64,6 @@ fn check_games(games_lines: &Vec<&str>, cubes_bag: &Subset) -> GameList {
         }
     }
 
-    println!("\nsum of game ids: {:?}", &id_accumulator);
-
     GameList {
         id_sum: id_accumulator,
         games: games_list,
