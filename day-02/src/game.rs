@@ -3,19 +3,6 @@ use std::result;
 use super::*;
 
 #[derive(Debug, Clone, PartialEq, Eq)]
-pub struct ValidatedGameList {
-    pub id_sum: i32,
-    pub games: Vec<Game>,
-    pub valid_games: Vec<Game>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
-pub struct MinimumCombinationGameList {
-    pub combinations_pow_sum: i32,
-    pub combinations: Vec<Subset>,
-}
-
-#[derive(Debug, Clone, PartialEq, Eq)]
 pub struct Game {
     pub id: i32,
     pub subsets: Vec<Subset>,
