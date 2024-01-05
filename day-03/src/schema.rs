@@ -19,6 +19,8 @@ impl Schema {
                 let mut schema_vec: Vec<Vec<SchemaElement>> = Vec::new();
                 let lines: Vec<&str> = content.lines().collect();
 
+                let mut all_parts: Vec<SchemaEnginePart> = Vec::new();
+
                 let mut line_number: usize = 0;
 
                 for line in lines {
@@ -27,12 +29,22 @@ impl Schema {
 
                     let mut line_vec: Vec<SchemaElement> = Vec::new();
                     let mut line_scanner = Scanner::new(line);
+
+                    let mut new_part: Vec<SchemaElement> = Vec::new();
+
                     let mut x_line: usize = 0;
 
                     line_scanner.scan(|character| {
                         let y_line = line_number.clone();
 
                         if character.eq(&'.') {
+                            if new_part.len() > 0 {
+                                all_parts.push(SchemaEnginePart {
+                                    elements: new_part.clone(),
+                                });
+                                new_part = Vec::new();
+                            }
+
                             line_vec.push(SchemaElement::Dot(SchemaElementProps {
                                 position: SchemaPosition {
                                     x: x_line,
@@ -55,7 +67,22 @@ impl Schema {
                         };
 
                         if character.is_numeric() {
-                            line_vec.push(SchemaElement::Number(SchemaElementProps {
+                            let new_element = SchemaElement::Number(SchemaElementProps {
+                                position: SchemaPosition {
+                                    x: x_line,
+                                    y: y_line,
+                                },
+                                value: character.to_string(),
+                                width: 1,
+                            });
+
+                            new_part.push(new_element.clone());
+
+                            line_vec.push(new_element)
+                        }
+
+                        if !character.is_numeric() && !character.is_alphabetic() {
+                            line_vec.push(SchemaElement::Symbol(SchemaElementProps {
                                 position: SchemaPosition {
                                     x: x_line,
                                     y: y_line,
@@ -70,6 +97,7 @@ impl Schema {
                     });
 
                     //println!("line_vec: {:?}", line_vec);
+                    println!("-----------\nall_parts: {:?}", all_parts);
                     schema_vec.push(line_vec);
                     line_number += 1;
                 }
@@ -108,6 +136,12 @@ impl Schema {
 pub struct SchemaPosition {
     pub x: usize,
     pub y: usize,
+}
+
+#[derive(Debug, Clone, Eq, PartialEq)]
+pub struct SchemaEnginePart {
+    //pub label: String,
+    pub elements: Vec<SchemaElement>,
 }
 
 #[derive(Debug, Clone, Eq, PartialEq)]
