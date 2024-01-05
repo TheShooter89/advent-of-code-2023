@@ -141,11 +141,24 @@ impl Schema {
             return None;
         }
 
-        Some(&self.schema[position.x][position.y])
+        Some(&self.schema[position.y][position.x])
     }
 
     pub fn parse_parts(&self, parts_list: Vec<SchemaEnginePart>) {
         //
+    }
+
+    pub fn has_symbol(&self, position: SchemaPosition) -> bool {
+        //
+        match self.get(position) {
+            Some(SchemaElement::Symbol(_)) => true,
+            _ => false,
+        }
+    }
+
+    pub fn collides_with_symbol(&self, parts_list: Vec<SchemaEnginePart>) -> bool {
+        //
+        false
     }
 }
 
