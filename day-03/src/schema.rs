@@ -5,11 +5,15 @@ use super::Scanner;
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Schema {
     schema: Vec<Vec<SchemaElement>>,
+    parts: Vec<SchemaElement>,
 }
 
 impl Schema {
     pub fn new() -> Schema {
-        Schema { schema: Vec::new() }
+        Schema {
+            schema: Vec::new(),
+            parts: Vec::new(),
+        }
     }
 
     pub fn from_file(file_path: &str) -> Schema {
@@ -81,7 +85,10 @@ impl Schema {
                             line_vec.push(new_element)
                         }
 
-                        if !character.is_numeric() && !character.is_alphabetic() {
+                        if !character.eq(&'.')
+                            && !character.is_numeric()
+                            && !character.is_alphabetic()
+                        {
                             line_vec.push(SchemaElement::Symbol(SchemaElementProps {
                                 position: SchemaPosition {
                                     x: x_line,
@@ -102,11 +109,17 @@ impl Schema {
                     line_number += 1;
                 }
 
-                Schema { schema: schema_vec }
+                Schema {
+                    schema: schema_vec,
+                    parts: Vec::new(),
+                }
             }
             Err(err) => {
                 eprintln!("Error in reading file '{}': {}", file_path, err);
-                Schema { schema: Vec::new() }
+                Schema {
+                    schema: Vec::new(),
+                    parts: Vec::new(),
+                }
             }
         }
     }
@@ -129,6 +142,10 @@ impl Schema {
         }
 
         Some(&self.schema[position.x][position.y])
+    }
+
+    pub fn parse_parts(&self, parts_list: Vec<SchemaEnginePart>) {
+        //
     }
 }
 
