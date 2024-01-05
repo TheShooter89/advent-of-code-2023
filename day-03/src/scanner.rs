@@ -36,6 +36,24 @@ impl Scanner {
             None => None,
         }
     }
+
+    pub fn scan<T>(&mut self, mut cb: impl FnMut(&char) -> Option<T>) -> Option<T> {
+        loop {
+            if self.is_done() {
+                return None;
+            }
+            match self.characters.get(self.cursor) {
+                Some(input) => match cb(input) {
+                    Some(output) => {
+                        self.cursor += 1;
+                        Some(output)
+                    }
+                    None => None,
+                },
+                None => None,
+            };
+        }
+    }
 }
 
 #[cfg(test)]
