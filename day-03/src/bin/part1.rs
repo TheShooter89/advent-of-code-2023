@@ -1,6 +1,6 @@
 use std::fs;
 
-use day03::{Engine, Schema};
+use day03::{Engine, Schema, SchemaPosition};
 
 fn print_title() {
     println!("Advent of Code 2023 - Day 02 [PART 1]\n");
@@ -14,6 +14,13 @@ fn main() -> Result<(), std::io::Error> {
     let content = fs::read_to_string("src/bin/input1.txt")?;
     //let content = fs::read_to_string("src/bin/test_input.txt")?;
     let lines: Vec<&str> = content.lines().collect();
+
+    let test_schema = Schema::from_file("src/bin/test_input.txt");
+    println!("test_schema is: {:?}", test_schema);
+    println!(
+        "test_schema.schema[0][0] is: {:?}",
+        test_schema.get(SchemaPosition { x: 0, y: 0 })
+    );
 
     Ok(())
 }
