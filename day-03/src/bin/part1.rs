@@ -1,6 +1,6 @@
 use std::fs;
 
-use day03::{Engine, Schema, SchemaPosition};
+use day03::{Engine, Schema, SchemaElement, SchemaElementProps, SchemaEnginePart, SchemaPosition};
 
 fn print_title() {
     println!("Advent of Code 2023 - Day 02 [PART 1]\n");
@@ -15,12 +15,68 @@ fn main() -> Result<(), std::io::Error> {
     //let content = fs::read_to_string("src/bin/test_input.txt")?;
     let lines: Vec<&str> = content.lines().collect();
 
-    let test_schema = Schema::from_file("src/bin/test_input.txt");
+    let mut test_schema = Schema::from_file("src/bin/test_input.txt");
+    println!("-----------------");
     println!("test_schema is: {:?}", test_schema);
+    println!("-----------------");
     println!(
         "test_schema.schema[0][0] is: {:?}",
         test_schema.get(SchemaPosition { x: 0, y: 0 })
     );
+
+    println!(
+        "test_schema(x: 5, y: 8) is: {:?}",
+        test_schema.get(SchemaPosition { x: 5, y: 8 }).unwrap()
+    );
+    println!(
+        "test_schema.has_symbol in (x: 5, y: 8) is: {:?}",
+        test_schema.has_symbol(SchemaPosition { x: 5, y: 8 })
+    );
+
+    println!(
+        "test_schema(x: 3, y: 2) is: {:?}",
+        test_schema.get(SchemaPosition { x: 3, y: 2 })
+    );
+
+    println!(
+        "test_schema collides with symbol in (x: 3, y: 2) is: {:?}",
+        test_schema.collides_with_symbol(SchemaElement::Number(SchemaElementProps {
+            position: SchemaPosition { x: 3, y: 2 },
+            value: "5".to_string(),
+            width: 1
+        }))
+    );
+
+    println!(
+        "test_schema collides with symbol in (x: 3, y: 9) is: {:?}",
+        test_schema.collides_with_symbol(SchemaElement::Number(SchemaElementProps {
+            position: SchemaPosition { x: 3, y: 9 },
+            value: "5".to_string(),
+            width: 1
+        }))
+    );
+
+    let mock_part = SchemaEnginePart {
+        elements: vec![
+            SchemaElement::Number(SchemaElementProps {
+                position: SchemaPosition { x: 2, y: 2 },
+                value: "3".to_string(),
+                width: 1,
+            }),
+            SchemaElement::Number(SchemaElementProps {
+                position: SchemaPosition { x: 3, y: 2 },
+                value: "5".to_string(),
+                width: 1,
+            }),
+            SchemaElement::Number(SchemaElementProps {
+                position: SchemaPosition { x: 8, y: 5 },
+                value: "8".to_string(),
+                width: 1,
+            }),
+        ],
+    };
+    //test_schema.parse_parts(vec![mock_part]);
+    println!("test_schema.parse_parts (x: 9, y: 9) is: {:?}", test_schema);
 
     Ok(())
 }

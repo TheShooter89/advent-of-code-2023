@@ -5,7 +5,7 @@ use super::Scanner;
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Schema {
     schema: Vec<Vec<SchemaElement>>,
-    parts: Vec<SchemaElement>,
+    parts: Vec<SchemaEnginePart>,
 }
 
 impl Schema {
@@ -24,6 +24,7 @@ impl Schema {
                 let lines: Vec<&str> = content.lines().collect();
 
                 let mut all_parts: Vec<SchemaEnginePart> = Vec::new();
+                let mut new_part: Vec<SchemaElement> = Vec::new();
 
                 let mut line_number: usize = 0;
 
@@ -34,7 +35,7 @@ impl Schema {
                     let mut line_vec: Vec<SchemaElement> = Vec::new();
                     let mut line_scanner = Scanner::new(line);
 
-                    let mut new_part: Vec<SchemaElement> = Vec::new();
+                    //let mut new_part: Vec<SchemaElement> = Vec::new();
 
                     let mut x_line: usize = 0;
 
@@ -42,7 +43,7 @@ impl Schema {
                         let y_line = line_number.clone();
 
                         if character.eq(&'.') {
-                            if new_part.len() > 0 {
+                            if !new_part.is_empty() {
                                 all_parts.push(SchemaEnginePart {
                                     elements: new_part.clone(),
                                 });
@@ -104,15 +105,18 @@ impl Schema {
                     });
 
                     //println!("line_vec: {:?}", line_vec);
-                    println!("-----------\nall_parts: {:?}", all_parts);
+                    println!("-----------\nall_parts: {:#?}", all_parts);
                     schema_vec.push(line_vec);
                     line_number += 1;
                 }
 
-                Schema {
+                let mut result = Schema {
                     schema: schema_vec,
                     parts: Vec::new(),
-                }
+                };
+                result.parse_parts(all_parts);
+
+                result
             }
             Err(err) => {
                 eprintln!("Error in reading file '{}': {}", file_path, err);
@@ -126,6 +130,10 @@ impl Schema {
 
     pub fn schema(&self) -> &Vec<Vec<SchemaElement>> {
         &self.schema
+    }
+
+    pub fn parts(&self) -> &Vec<SchemaEnginePart> {
+        &self.parts
     }
 
     pub fn get(&self, position: SchemaPosition) -> Option<&SchemaElement> {
@@ -144,8 +152,14 @@ impl Schema {
         Some(&self.schema[position.y][position.x])
     }
 
-    pub fn parse_parts(&self, parts_list: Vec<SchemaEnginePart>) {
-        //
+    pub fn parse_parts(&mut self, parts_list: Vec<SchemaEnginePart>) {
+        for part in &parts_list {
+            for element in &part.elements {
+                if self.collides_with_symbol(element.clone()) {
+                    self.parts.push(part.clone())
+                }
+            }
+        }
     }
 
     pub fn has_symbol(&self, position: SchemaPosition) -> bool {
@@ -156,8 +170,77 @@ impl Schema {
         }
     }
 
-    pub fn collides_with_symbol(&self, parts_list: Vec<SchemaEnginePart>) -> bool {
-        //
+    pub fn collides_with_symbol(&self, element: SchemaElement) -> bool {
+        let TOP_LEFT = if element.position().x < 1 {
+            element.position().x - 1
+        } else {
+            0
+        };
+
+        // top-left
+        if self.has_symbol(SchemaPosition {
+            x: element.position().x - 1,
+            y: element.position().y - 1,
+        }) {
+            return true;
+        }
+
+        // left
+        if self.has_symbol(SchemaPosition {
+            x: element.position().x - 1,
+            y: element.position().y,
+        }) {
+            return true;
+        }
+
+        // bottom-left
+        if self.has_symbol(SchemaPosition {
+            x: element.position().x - 1,
+            y: element.position().y + 1,
+        }) {
+            return true;
+        }
+
+        // botton-right
+        if self.has_symbol(SchemaPosition {
+            x: element.position().x + 1,
+            y: element.position().y - 1,
+        }) {
+            return true;
+        }
+
+        // right
+        if self.has_symbol(SchemaPosition {
+            x: element.position().x + 1,
+            y: element.position().y,
+        }) {
+            return true;
+        }
+
+        // top-right
+        if self.has_symbol(SchemaPosition {
+            x: element.position().x + 1,
+            y: element.position().y + 1,
+        }) {
+            return true;
+        }
+
+        // top
+        if self.has_symbol(SchemaPosition {
+            x: element.position().x,
+            y: element.position().y + 1,
+        }) {
+            return true;
+        }
+
+        // bottom
+        if self.has_symbol(SchemaPosition {
+            x: element.position().x,
+            y: element.position().y - 1,
+        }) {
+            return true;
+        }
+
         false
     }
 }
