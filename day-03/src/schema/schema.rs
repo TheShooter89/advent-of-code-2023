@@ -1,11 +1,15 @@
 use std::{fs, usize};
 
-use super::Scanner;
+use crate::Scanner;
+
+use super::element::{Element, ElementProps};
+use super::engine_part::EnginePart;
+use super::position::Position;
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Schema {
-    schema: Vec<Vec<SchemaElement>>,
-    parts: Vec<SchemaEnginePart>,
+    schema: Vec<Vec<Element>>,
+    parts: Vec<EnginePart>,
 }
 
 impl Schema {
@@ -20,11 +24,11 @@ impl Schema {
         match fs::read_to_string(file_path) {
             Ok(content) => {
                 //
-                let mut schema_vec: Vec<Vec<SchemaElement>> = Vec::new();
+                let mut schema_vec: Vec<Vec<Element>> = Vec::new();
                 let lines: Vec<&str> = content.lines().collect();
 
-                let mut all_parts: Vec<SchemaEnginePart> = Vec::new();
-                let mut new_part: Vec<SchemaElement> = Vec::new();
+                let mut all_parts: Vec<EnginePart> = Vec::new();
+                let mut new_part: Vec<Element> = Vec::new();
 
                 let mut line_number: usize = 0;
 
@@ -32,10 +36,10 @@ impl Schema {
                     //println!("line nuber: {:?}", line_number);
                     //println!("line: {:?}", line);
 
-                    let mut line_vec: Vec<SchemaElement> = Vec::new();
+                    let mut line_vec: Vec<Element> = Vec::new();
                     let mut line_scanner = Scanner::new(line);
 
-                    //let mut new_part: Vec<SchemaElement> = Vec::new();
+                    //let mut new_part: Vec<Element> = Vec::new();
 
                     let mut x_line: usize = 0;
 
@@ -44,14 +48,14 @@ impl Schema {
 
                         if character.eq(&'.') {
                             if !new_part.is_empty() {
-                                all_parts.push(SchemaEnginePart {
+                                all_parts.push(EnginePart {
                                     elements: new_part.clone(),
                                 });
                                 new_part = Vec::new();
                             }
 
-                            line_vec.push(SchemaElement::Dot(SchemaElementProps {
-                                position: SchemaPosition {
+                            line_vec.push(Element::Dot(ElementProps {
+                                position: Position {
                                     x: x_line,
                                     y: y_line,
                                 },
@@ -61,8 +65,8 @@ impl Schema {
                         };
 
                         if character.is_alphabetic() {
-                            line_vec.push(SchemaElement::Unknown(SchemaElementProps {
-                                position: SchemaPosition {
+                            line_vec.push(Element::Unknown(ElementProps {
+                                position: Position {
                                     x: x_line,
                                     y: y_line,
                                 },
@@ -72,8 +76,8 @@ impl Schema {
                         };
 
                         if character.is_numeric() {
-                            let new_element = SchemaElement::Number(SchemaElementProps {
-                                position: SchemaPosition {
+                            let new_element = Element::Number(ElementProps {
+                                position: Position {
                                     x: x_line,
                                     y: y_line,
                                 },
@@ -90,8 +94,8 @@ impl Schema {
                             && !character.is_numeric()
                             && !character.is_alphabetic()
                         {
-                            line_vec.push(SchemaElement::Symbol(SchemaElementProps {
-                                position: SchemaPosition {
+                            line_vec.push(Element::Symbol(ElementProps {
+                                position: Position {
                                     x: x_line,
                                     y: y_line,
                                 },
@@ -128,15 +132,15 @@ impl Schema {
         }
     }
 
-    pub fn schema(&self) -> &Vec<Vec<SchemaElement>> {
+    pub fn schema(&self) -> &Vec<Vec<Element>> {
         &self.schema
     }
 
-    pub fn parts(&self) -> &Vec<SchemaEnginePart> {
+    pub fn parts(&self) -> &Vec<EnginePart> {
         &self.parts
     }
 
-    pub fn get(&self, position: SchemaPosition) -> Option<&SchemaElement> {
+    pub fn get(&self, position: Position) -> Option<&Element> {
         if self.schema.len() == 0 {
             return None;
         }
@@ -152,7 +156,7 @@ impl Schema {
         Some(&self.schema[position.y][position.x])
     }
 
-    pub fn parse_parts(&mut self, parts_list: Vec<SchemaEnginePart>) {
+    pub fn parse_parts(&mut self, parts_list: Vec<EnginePart>) {
         for part in &parts_list {
             for element in &part.elements {
                 if self.collides_with_symbol(element.clone()) {
@@ -162,15 +166,15 @@ impl Schema {
         }
     }
 
-    pub fn has_symbol(&self, position: SchemaPosition) -> bool {
+    pub fn has_symbol(&self, position: Position) -> bool {
         //
         match self.get(position) {
-            Some(SchemaElement::Symbol(_)) => true,
+            Some(Element::Symbol(_)) => true,
             _ => false,
         }
     }
 
-    pub fn collides_with_symbol(&self, element: SchemaElement) -> bool {
+    pub fn collides_with_symbol(&self, element: Element) -> bool {
         let TOP_LEFT = if element.position().x < 1 {
             element.position().x - 1
         } else {
@@ -178,7 +182,7 @@ impl Schema {
         };
 
         // top-left
-        if self.has_symbol(SchemaPosition {
+        if self.has_symbol(Position {
             x: element.position().x - 1,
             y: element.position().y - 1,
         }) {
@@ -186,7 +190,7 @@ impl Schema {
         }
 
         // left
-        if self.has_symbol(SchemaPosition {
+        if self.has_symbol(Position {
             x: element.position().x - 1,
             y: element.position().y,
         }) {
@@ -194,7 +198,7 @@ impl Schema {
         }
 
         // bottom-left
-        if self.has_symbol(SchemaPosition {
+        if self.has_symbol(Position {
             x: element.position().x - 1,
             y: element.position().y + 1,
         }) {
@@ -202,7 +206,7 @@ impl Schema {
         }
 
         // botton-right
-        if self.has_symbol(SchemaPosition {
+        if self.has_symbol(Position {
             x: element.position().x + 1,
             y: element.position().y - 1,
         }) {
@@ -210,7 +214,7 @@ impl Schema {
         }
 
         // right
-        if self.has_symbol(SchemaPosition {
+        if self.has_symbol(Position {
             x: element.position().x + 1,
             y: element.position().y,
         }) {
@@ -218,7 +222,7 @@ impl Schema {
         }
 
         // top-right
-        if self.has_symbol(SchemaPosition {
+        if self.has_symbol(Position {
             x: element.position().x + 1,
             y: element.position().y + 1,
         }) {
@@ -226,7 +230,7 @@ impl Schema {
         }
 
         // top
-        if self.has_symbol(SchemaPosition {
+        if self.has_symbol(Position {
             x: element.position().x,
             y: element.position().y + 1,
         }) {
@@ -234,7 +238,7 @@ impl Schema {
         }
 
         // bottom
-        if self.has_symbol(SchemaPosition {
+        if self.has_symbol(Position {
             x: element.position().x,
             y: element.position().y - 1,
         }) {
@@ -242,61 +246,5 @@ impl Schema {
         }
 
         false
-    }
-}
-
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub struct SchemaPosition {
-    pub x: usize,
-    pub y: usize,
-}
-
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub struct SchemaEnginePart {
-    //pub label: String,
-    pub elements: Vec<SchemaElement>,
-}
-
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub struct SchemaElementProps {
-    pub position: SchemaPosition,
-    pub value: String,
-    pub width: usize,
-}
-
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub enum SchemaElement {
-    Dot(SchemaElementProps),
-    Symbol(SchemaElementProps),
-    Number(SchemaElementProps),
-    Unknown(SchemaElementProps),
-}
-
-impl SchemaElement {
-    pub fn position(&self) -> &SchemaPosition {
-        match self {
-            SchemaElement::Dot(props) => &props.position,
-            SchemaElement::Symbol(props) => &props.position,
-            SchemaElement::Number(props) => &props.position,
-            SchemaElement::Unknown(props) => &props.position,
-        }
-    }
-
-    pub fn value(&self) -> &String {
-        match self {
-            SchemaElement::Dot(props) => &props.value,
-            SchemaElement::Symbol(props) => &props.value,
-            SchemaElement::Number(props) => &props.value,
-            SchemaElement::Unknown(props) => &props.value,
-        }
-    }
-
-    pub fn width(&self) -> usize {
-        match self {
-            SchemaElement::Dot(props) => props.width,
-            SchemaElement::Symbol(props) => props.width,
-            SchemaElement::Number(props) => props.width,
-            SchemaElement::Unknown(props) => props.width,
-        }
     }
 }
