@@ -11,72 +11,39 @@ fn print_title() {
 fn main() -> Result<(), std::io::Error> {
     print_title();
 
-    let content = fs::read_to_string("src/bin/input1.txt")?;
-    //let content = fs::read_to_string("src/bin/test_input.txt")?;
-    let lines: Vec<&str> = content.lines().collect();
+    // let source_file = "src/bin/input1.txt";
+    let source_file = "src/bin/test_input.txt";
 
-    let mut test_schema = Schema::from_file("src/bin/test_input.txt");
+    let mut test_schema = Schema::from_file(source_file);
+    println!("\nparsing schema from file \"{}\"...\n", source_file);
     println!("-----------------");
-    println!("test_schema is: {:?}", test_schema);
+    //println!("test_schema is: {:#?}", test_schema);
     println!("-----------------");
-    println!(
-        "test_schema.schema[0][0] is: {:?}",
-        test_schema.get(Position { x: 0, y: 0 })
-    );
 
-    println!(
-        "test_schema(x: 5, y: 8) is: {:?}",
-        test_schema.get(Position { x: 5, y: 8 }).unwrap()
-    );
-    println!(
-        "test_schema.has_symbol in (x: 5, y: 8) is: {:?}",
-        test_schema.has_symbol(Position { x: 5, y: 8 })
-    );
+    println!("\n\n# STATISTICS #");
+    println!("-----------------\n");
 
-    println!(
-        "test_schema(x: 3, y: 2) is: {:?}",
-        test_schema.get(Position { x: 3, y: 2 })
-    );
+    let parsed_schema = test_schema.schema();
+    let schema_width = parsed_schema.len();
+    let schema_height = parsed_schema[schema_width - 1].len();
 
-    println!(
-        "test_schema collides with symbol in (x: 3, y: 2) is: {:?}",
-        test_schema.collides_with_symbol(Element::Number(ElementProps {
-            position: Position { x: 3, y: 2 },
-            value: "5".to_string(),
-            width: 1
-        }))
-    );
+    let parsed_engine_parts = test_schema.parts();
+    let mut engine_parts_sum = 0;
 
-    println!(
-        "test_schema collides with symbol in (x: 3, y: 9) is: {:?}",
-        test_schema.collides_with_symbol(Element::Number(ElementProps {
-            position: Position { x: 3, y: 9 },
-            value: "5".to_string(),
-            width: 1
-        }))
-    );
+    for part in parsed_engine_parts {
+        println!("part: {:?}", part);
+        println!("part value: {}", part.value());
+        engine_parts_sum += part.value();
+    }
 
-    let mock_part = EnginePart {
-        elements: vec![
-            Element::Number(ElementProps {
-                position: Position { x: 2, y: 2 },
-                value: "3".to_string(),
-                width: 1,
-            }),
-            Element::Number(ElementProps {
-                position: Position { x: 3, y: 2 },
-                value: "5".to_string(),
-                width: 1,
-            }),
-            Element::Number(ElementProps {
-                position: Position { x: 8, y: 5 },
-                value: "8".to_string(),
-                width: 1,
-            }),
-        ],
-    };
-    //test_schema.parse_parts(vec![mock_part]);
-    println!("test_schema.parse_parts (x: 9, y: 9) is: {:?}", test_schema);
+    println!("engine schema width: {}", schema_width);
+    println!("engine schema height: {}", schema_height);
+    println!(
+        "total engine parts on schema: {}",
+        parsed_engine_parts.len()
+    );
+    println!("\nsum of engine parts values: {}", engine_parts_sum);
+    println!("-----------------");
 
     Ok(())
 }
@@ -87,11 +54,7 @@ mod tests {
 
     #[test]
     fn test_solution() {
-        //let content = fs::read_to_string("src/bin/input1.txt").unwrap();
-        let content = fs::read_to_string("src/bin/test_input.txt").unwrap();
-        let lines: Vec<&str> = content.lines().collect();
-
-        //assert_eq!(games_list.id_sum, 2563);
-        assert_eq!(3, 8);
+        let mut test_schema = Schema::from_file("src/bin/test_input.txt");
+        //
     }
 }

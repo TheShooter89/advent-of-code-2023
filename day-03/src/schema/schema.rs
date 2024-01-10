@@ -4,7 +4,7 @@ use crate::Scanner;
 
 use super::element::{Element, ElementProps};
 use super::engine_part::EnginePart;
-use super::position::Position;
+use super::position::{Edges, Position};
 
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct Schema {
@@ -26,6 +26,7 @@ impl Schema {
                 //
                 let mut schema_vec: Vec<Vec<Element>> = Vec::new();
                 let lines: Vec<&str> = content.lines().collect();
+                println!("total lines on file: {}", lines.len());
 
                 let mut all_parts: Vec<EnginePart> = Vec::new();
                 let mut new_part: Vec<Element> = Vec::new();
@@ -109,7 +110,7 @@ impl Schema {
                     });
 
                     //println!("line_vec: {:?}", line_vec);
-                    println!("-----------\nall_parts: {:#?}", all_parts);
+                    //println!("-----------\nall_parts: {:#?}", all_parts);
                     schema_vec.push(line_vec);
                     line_number += 1;
                 }
@@ -118,6 +119,7 @@ impl Schema {
                     schema: schema_vec,
                     parts: Vec::new(),
                 };
+                println!("total number of parts found: {}", all_parts.len());
                 result.parse_parts(all_parts);
 
                 result
@@ -157,13 +159,24 @@ impl Schema {
     }
 
     pub fn parse_parts(&mut self, parts_list: Vec<EnginePart>) {
+        let mut validated_parts: Vec<EnginePart> = vec![];
+
         for part in &parts_list {
+            let mut is_valid = false;
             for element in &part.elements {
                 if self.collides_with_symbol(element.clone()) {
-                    self.parts.push(part.clone())
+                    //self.parts.push(part.clone());
+                    is_valid = true;
                 }
             }
+            println!("is part valid: {}", is_valid);
+
+            if is_valid {
+                //
+                validated_parts.push(part.clone());
+            }
         }
+        self.parts = validated_parts;
     }
 
     pub fn has_symbol(&self, position: Position) -> bool {
@@ -175,74 +188,30 @@ impl Schema {
     }
 
     pub fn collides_with_symbol(&self, element: Element) -> bool {
-        let TOP_LEFT = if element.position().x < 1 {
-            element.position().x - 1
-        } else {
-            0
-        };
+        let edges = vec![
+            Edges::TOP_LEFT,
+            Edges::TOP,
+            Edges::TOP_RIGHT,
+            Edges::LEFT,
+            Edges::RIGHT,
+            Edges::BOTTOM_LEFT,
+            Edges::BOTTOM,
+            Edges::BOTTOM_RIGHT,
+        ];
 
-        // top-left
-        if self.has_symbol(Position {
-            x: element.position().x - 1,
-            y: element.position().y - 1,
-        }) {
-            return true;
-        }
+        for edge in edges {
+            let computed_element = edge.compute(&element, self);
+            match computed_element {
+                Some(position) => {
+                    let element = self.get(position).unwrap();
 
-        // left
-        if self.has_symbol(Position {
-            x: element.position().x - 1,
-            y: element.position().y,
-        }) {
-            return true;
-        }
-
-        // bottom-left
-        if self.has_symbol(Position {
-            x: element.position().x - 1,
-            y: element.position().y + 1,
-        }) {
-            return true;
-        }
-
-        // botton-right
-        if self.has_symbol(Position {
-            x: element.position().x + 1,
-            y: element.position().y - 1,
-        }) {
-            return true;
-        }
-
-        // right
-        if self.has_symbol(Position {
-            x: element.position().x + 1,
-            y: element.position().y,
-        }) {
-            return true;
-        }
-
-        // top-right
-        if self.has_symbol(Position {
-            x: element.position().x + 1,
-            y: element.position().y + 1,
-        }) {
-            return true;
-        }
-
-        // top
-        if self.has_symbol(Position {
-            x: element.position().x,
-            y: element.position().y + 1,
-        }) {
-            return true;
-        }
-
-        // bottom
-        if self.has_symbol(Position {
-            x: element.position().x,
-            y: element.position().y - 1,
-        }) {
-            return true;
+                    match element {
+                        Element::Symbol(_) => return true,
+                        _ => continue,
+                    }
+                }
+                None => continue,
+            }
         }
 
         false
